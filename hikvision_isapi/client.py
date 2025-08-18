@@ -131,7 +131,7 @@ class HikvisionClient:
     def get_users(self):
         print ('get users CAOUNT......')
         res = self.request(
-            method="GET",
+            method="POST",
             path="/ISAPI/AccessControl/UserInfo/Search?format=json",
 
         )
@@ -255,7 +255,7 @@ class HikvisionClient:
     def search_all_emps(self):
         print ('Search ALL Employeee....')
         searchemp = {"UserInfoSearchCond": {
-                "searchID": "1",
+                "searchID": "3",
                 "searchResultPosition": 0,
                 "maxResults": 200,
                 "EmployeeNoList":[]
