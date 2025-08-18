@@ -1,14 +1,32 @@
 #Created by Helkds
-#Last Modified 23-02-2023
+#Last Modified 18-08-2025
 '''
     Reads Employee CSV file exported from ERPNext / MetaGest.
     Check if Employee Active and if ATTENDANCE ID assigned
     Adds Employess to ZKTECO.
 '''
 import sys
-from zk import ZK, const
-
 import csv
+
+import os
+import json
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+import importlib.util
+
+spec = importlib.util.spec_from_file_location("hikvision_isapi", "./hikvision_isapi/client.py")
+hikvision_C = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(hikvision_C)
+
+hikvision_client = hikvision_C.HikvisionClient(
+    base_url=os.getenv("HIK_URL", "http://192.168.8.25"),
+    username=os.getenv("HIK_USERNAME", "admin"),
+    password=os.getenv("HIK_PASSWORD", "admin2025"),
+)
 
 def ler_ficheiro(ficheiro):
         
@@ -25,17 +43,22 @@ def ler_ficheiro(ficheiro):
         csvFile = csv.reader(file)
         # displaying the contents of the CSV file
         for idx,lines in enumerate(csvFile):
+            print ("lines ")
+            print ('idx ', idx)
+            print (lines)
             if idx >0:
-                if lines[4] != 'Left':
+                print ('lines 3 (Status) ', lines[3])
+                print ('lines 4 (NOME) ', lines[4])
+                if lines[3] != 'Left':
                     #0 Number,1 NAME, 2 Full Name, 3 Attendance ID, 4 Status
                     print ('Verifica se tem o Numero do Attendance ID...')
-                    if lines[3]:
+                    if lines[5]:
                         print ('Adicionar ao Biometrico.... ', lines[1])
-                        func_adicionar_bio['nome'].append(lines[2])
-                        func_adicionar_bio['attid'].append(lines[3])
+                        func_adicionar_bio['nome'].append(lines[4])
+                        func_adicionar_bio['attid'].append(lines[5])
                     else:
-                        print ('Este Funcinonario {} nao tem ID do BIOMETRICO... '.format(lines[2]))
-                        func_not_added.append(lines[2])
+                        print ('Este Funcinonario {} nao tem ID do BIOMETRICO... '.format(lines[1]))
+                        func_not_added.append(lines[1])
 
         if func_not_added:
             print ('lista de Funcionarios nao adicionados...')
@@ -44,43 +67,63 @@ def ler_ficheiro(ficheiro):
         print (len(func_adicionar_bio['nome']))
     return func_adicionar_bio
 
-def actualizar_zk(deviceIP,func_adicionar_bio):
+def actualizar_hikvision(deviceIP,func_adicionar_bio):
     conn = None
     # create ZK instance
-    zk = ZK(deviceIP, port=4370, timeout=5, password=0, force_udp=False, ommit_ping=False)
+    #zk = ZK(deviceIP, port=4370, timeout=5, password=0, force_udp=False, ommit_ping=False)
+    
+
     try:
         # connect to device
-        conn = zk.connect()
+        #conn = zk.connect()
         # disable device, this method ensures no activity on the device while the process is run
-        conn.disable_device()
+        #conn.disable_device()
         # Create users
         if func_adicionar_bio:
             cc = 0
             while cc < len(func_adicionar_bio['nome']):
-                conn.set_user(uid=int(func_adicionar_bio['attid'][cc]), name=str(func_adicionar_bio['nome'][cc]), privilege='User', password='12345678', group_id='', user_id=func_adicionar_bio['attid'][cc], card=0)
+                #conn.set_user(uid=int(func_adicionar_bio['attid'][cc]), name=str(func_adicionar_bio['nome'][cc]), privilege='User', password='12345678', group_id='', user_id=func_adicionar_bio['attid'][cc], card=0)
+                novoUser = hikvision_client.create_user(empNo=func_adicionar_bio['attid'][cc],empName=str(func_adicionar_bio['nome'][cc]))
+                print ('********Creating... NEW USER')
+                print (novoUser.status_code)
+                print (novoUser.text)
+
                 cc += 1
 
-        users = conn.get_users()
-        for user in users:
+        #users = conn.get_users()
+        lista_users = hikvision_client.search_all_emps()
+        listausers = json.loads(lista_users.text)['UserInfoSearch']['UserInfo']
+        for user in listausers:
             privilege = 'User'
-            if user.privilege == const.USER_ADMIN:
-                privilege = 'Admin'
+            #if user.privilege == const.USER_ADMIN:
+            #    privilege = 'Admin'
+            '''
             print ('+ UID #{}'.format(user.uid))
             print ('  Name       : {}'.format(user.name))
             print ('  Privilege  : {}'.format(privilege))
             print ('  Password   : {}'.format(user.password))
             print ('  Group ID   : {}'.format(user.group_id))
             print ('  User  ID   : {}'.format(user.user_id))
+            '''
+
+            print ('=============')
+            print (user)
+            print ('emp ', user['employeeNo'])
+
+            print ('+ EmployeeNo #{}'.format(user['employeeNo']))
+            print ('  Name       : {}'.format(user['name']))
+            print ('  User Type   : {}'.format(user['userType']))            
 
         # Test Voice: Say Thank You
-        conn.test_voice()
+        #conn.test_voice()
         # re-enable device after all commands already executed
-        conn.enable_device()
+        #conn.enable_device()
     except Exception as e:
         print ("Process terminate : {}".format(e))
     finally:
-        if conn:
-            conn.disconnect()
+        print ('TERMINOU de Adicionar....')
+        #if conn:
+        #    conn.disconnect()
 
 def valid_ip(address):
     try:
@@ -111,5 +154,8 @@ if __name__ == "__main__":
             if IPvalid: deviceIP = arg
             print (IPvalid)
     if IPvalid and file_csv:
-        actualizar_zk(deviceIP,ler_ficheiro(ficheiro_csv))
+        actualizar_hikvision(deviceIP,ler_ficheiro(ficheiro_csv))
+    else:
+        print ('Leitura do ficheiro CSV somente...')
+        ler_ficheiro(ficheiro_csv)
         

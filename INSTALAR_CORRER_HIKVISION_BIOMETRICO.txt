@@ -3,7 +3,7 @@
 1.2 Instalar como administrador (selecionar ADD python.exe to PATH)
 1.3 Clique Install NOW
 2. Descarregar App
-https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/master.zip
+https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/master13.zip
 2.1 Unzip para pasta c:\ferramenta-biometrico-registo
 	2.1.1 MOVER o conteudo da pasta biometric-attendance-sync-tool-mastar para ferramenta-biometrico-registo
 2.2 Abrir linha de comando COMO ADMINISTRADOR
@@ -14,14 +14,14 @@ https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/mast
 	2.2.3 Correr:
 		copy local_config.py.template local_config.py
 	2.3 Configurar o SITE / PAGINA
-		2.3.1	Criar um usuario ZKTECO@metagest.co.ao (nao precisa ser email real) com permissao somente no RH como HR USER/USUARIO RH
+		2.3.1	Criar um usuario HIKVISION@metagest.co.ao (nao precisa ser email real) com permissao somente no RH como HR USER/USUARIO RH
 		2.3.2 Criar uma senha (qualquer)
 		2.3.3 Ainda na ficha do Usuario ir ao fim do formulario em API ACCESS / ACESSO API e gerar CHAVES
 			2.3.3.1 Salvar a SECRET API e faz RECARREGAR para ver qual o API KEY
 				Key podera ser 791c2e1e2d6456e
 				Secret podera ser 825e71759e03c53
 				Devem ser inseridos depois no ficheiro local_config.py
-				Esta KEY e SECRET foram gerados no site demo-i3s.angolaerp.co.ao para o usuario GKTECO... 
+				Esta KEY e SECRET foram gerados no site demo-XXX.angolaerp.co.ao para o usuario HIKVISION... 
 				Mas sempre podes gerar outra e substituir aqui ou gerar outro usuario desde que o mesmo tenha somente ACESSO ao RH.
 
 	2.3	Configuracao para o ficheiro local_config.py
@@ -29,8 +29,8 @@ https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/mast
 		# ERPNext related configs
 		ERPNEXT_API_KEY = '791c2e1e2d6456e'
 		ERPNEXT_API_SECRET = '825e71759e03c53'
-		ERPNEXT_URL = 'https://demo-i3s.angolaerp.co.ao'
-		ERPNEXT_VERSION = 12
+		ERPNEXT_URL = 'https://demo-XXXX.angolaerp.co.ao'
+		ERPNEXT_VERSION = 13
 
 
 		Mais em baixo no mesmo ficheiro 
@@ -71,7 +71,7 @@ https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/mast
 			ID DO DISPOSITIVO DE ATENDIMENTO
 		Relembrar que somente NUMEROS sao aceites no Biometrico
 		Caso somente 1 EMPRESA
-			Caso a Empresa tenha varios funcionarios com a numeracao interna como HR-EMP-0001 at 1000
+			Caso a Empresa tenha varios funcionarios com a numeracao interna como HR-EMP-0001 ate 1000
 			Entao no aparelho os numeros vao ser 1 ate 1000
 		Caso tenham mais que 1 EMPRESA no sistema
 			A separacao dos funcionarios das varias Empresas podem ser feitas:
@@ -88,8 +88,8 @@ https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/mast
 		Renomear o ficheiro para lista_funcionarios.csv
 
 	3.6.3 Descarregar o seguinte:
-		https://github.com/Helkyd/Scripts_ZKTECO_ERPNEXT/archive/refs/heads/main.zip
-		Unzip e dentro da Pasta Scripts_ZK tem duas Scripts.
+		https://github.com/Helkyd/Scripts_HIKVISION_ERPNEXT/archive/refs/heads/main.zip
+		Unzip e dentro tem duas Scripts (ler_ficheiro_funcionarios e listar_funcionarios).
 		Devem correr no mesmo PC ou Servidor dos passos feitos em CIMA.
 		
 	3.6.4	Copiar o ficheiro exportado lista_funcionarios.csv para o mesmo Servidor/PC do ponto 3.6.3
