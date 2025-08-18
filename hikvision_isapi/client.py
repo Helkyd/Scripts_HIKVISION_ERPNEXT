@@ -276,8 +276,8 @@ class HikvisionClient:
             "maxResults":100,
             "major":0,
             "minor":0,
-            "startTime": "2025-08-15T06:00:00+08:00",
-            "endTime": "2025-08-15T22:00:00+08:00",
+            "startTime": "2025-08-15T00:00:00+08:00",
+            "endTime": "2025-08-15T23:59:59+08:00",
             }
         }
         res = self.request(

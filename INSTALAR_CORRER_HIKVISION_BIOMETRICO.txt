@@ -57,7 +57,7 @@ https://github.com/Helkyd/biometric-attendance-sync-tool/archive/refs/heads/mast
 		criar um ficheiro sync_biometrico.bat
 		dentro digitar 
 			cd \ferramenta-biometrico-registo
-			python erpnext_sync.py
+			python erpnext_sync_hik.py
 		Salvar o ficheiro
 		2.2.6.1
 			Este ficheiro pode ser posto para sempre que inicial o Servidor ou PC ele correr.
