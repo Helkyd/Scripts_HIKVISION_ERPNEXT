@@ -303,7 +303,7 @@ class HikvisionClient:
                 "maxResults":100,
                 "major":0,
                 "minor":0,
-                "startTime": dataInicio + "T00:00:00+08:00",
+                "startTime": dataInicio + "T00:00:00+06:00",
                 "endTime": dataFim + "T23:59:59+08:00",
                 }
             }
@@ -315,7 +315,7 @@ class HikvisionClient:
                 "maxResults":100,
                 "major":0,
                 "minor":0,
-                "startTime": str(today) + "T00:00:00+08:00",
+                "startTime": str(today) + "T00:00:00+06:00",
                 "endTime": str(today) + "T23:59:59+08:00",
                 }
             }
