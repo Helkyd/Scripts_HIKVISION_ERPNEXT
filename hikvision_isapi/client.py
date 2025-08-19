@@ -290,7 +290,7 @@ class HikvisionClient:
         return res
     
     
-    def all_event_search(self,dataInicio=None,dataFim=None):
+    def OLD_all_event_search(self,dataInicio=None,dataFim=None):
         print ('All Event search...')
         # Get today's date in YYYY-MM-DD format
         today = datetime.now().strftime("%Y-%m-%d")
@@ -303,19 +303,19 @@ class HikvisionClient:
                 "maxResults":100,
                 "major":0,
                 "minor":0,
-                "startTime": dataInicio + "T00:00:00+06:00",
+                "startTime": dataInicio + "T00:00:00+05:00",
                 "endTime": dataFim + "T23:59:59+08:00",
                 }
             }
 
         else:
             eventsearch = {"AcsEventCond": {
-                "searchID":"1",
-                "searchResultPosition":0,
+                "searchID":"2",
+                "searchResultPosition":25,  #TODO from 1 to 25 until we find out how to get all at once
                 "maxResults":100,
                 "major":0,
                 "minor":0,
-                "startTime": str(today) + "T00:00:00+06:00",
+                "startTime": str(today) + "T00:00:00+05:00",
                 "endTime": str(today) + "T23:59:59+08:00",
                 }
             }
@@ -325,3 +325,204 @@ class HikvisionClient:
             json=eventsearch,
         )
         return res    
+    
+    def all_event_search_V0(self,dataInicio=None,dataFim=None):
+        print ('All Event search...')
+        # Get today's date in YYYY-MM-DD format
+        today = datetime.now().strftime("%Y-%m-%d")
+        '''
+        if dataInicio and dataFim:
+            #set dates
+            eventsearch = {"AcsEventCond": {
+                "searchID":"1",
+                "searchResultPosition":0,
+                "maxResults":100,
+                "major":0,
+                "minor":0,
+                "startTime": dataInicio + "T00:00:00+05:00",
+                "endTime": dataFim + "T23:59:59+08:00",
+                }
+            }
+
+        else:
+            eventsearch = {"AcsEventCond": {
+                "searchID":"2",
+                "searchResultPosition":25,  #TODO from 1 to 25 until we find out how to get all at once
+                "maxResults":100,
+                "major":0,
+                "minor":0,
+                "startTime": str(today) + "T00:00:00+05:00",
+                "endTime": str(today) + "T23:59:59+08:00",
+                }
+            }
+        res = self.request(
+            method="POST",
+            path="/ISAPI/AccessControl/AcsEvent?format=json",
+            json=eventsearch,
+        )
+        return res    
+        '''
+    
+
+        # Loop through searchResultPosition from 0 to 25
+        all_events = []
+
+        for search_result_position in range(0, 26):
+
+            if dataInicio and dataFim:
+                #set dates
+                eventsearch = {"AcsEventCond": {
+                    "searchID":"1",
+                    "searchResultPosition":search_result_position,
+                    "maxResults":100,
+                    "major":0,
+                    "minor":0,
+                    "startTime": dataInicio + "T00:00:00+05:00",
+                    "endTime": dataFim + "T23:59:59+08:00",
+                    }
+                }
+
+            else:
+
+                eventsearch = {
+                    "AcsEventCond": {
+                        "searchID": "2",
+                        "searchResultPosition": search_result_position,
+                        "maxResults": 100,
+                        "major": 0,
+                        "minor": 0,
+                        "startTime": str(today) + "T00:00:00+05:00",
+                        "endTime": str(today) + "T23:59:59+08:00",
+                    }
+                }
+            
+            res = self.request(
+                method="POST",
+                path="/ISAPI/AccessControl/AcsEvent?format=json",
+                json=eventsearch,
+            )
+            print ('resssssss')
+            print ('tem attr ', hasattr(res, 'json'))
+            print ('callable ', callable(getattr(res, 'json')))
+            print (res.json())
+            
+            # Optional: Add a small delay to avoid overwhelming the API
+            # time.sleep(0.1)
+
+            # Assuming res contains JSON data with events
+            # Extract the events and add them to your list
+            if hasattr(res, 'json') and callable(getattr(res, 'json')):
+                events_data = res.json()
+                # Adjust this based on the actual structure of your response
+                if 'AcsEvent' in events_data:
+                    #all_events.extend(events_data['AcsEvent'])
+                    all_events.append(events_data)
+            else:
+                # If res is already the parsed data
+                print ('aqqqqqui')
+                return
+                if isinstance(res, dict) and 'AcsEvent' in res:
+                    all_events.extend(res)
+
+        # Now all_events contains all events from positions 0 through 25
+        print ('========================')
+        print (all_events)
+        print ('////////////////////////')
+        print (all_events[0])
+        print ('//////////////////////////')
+        print (all_events[1])
+        print ('================')
+        print (len(all_events))
+        print (all_events[0]['AcsEvent'])
+
+        return
+
+        return all_events
+
+    def all_event_search(self,dataInicio=None,dataFim=None):
+        print ('All Event search...')
+        # Get today's date in YYYY-MM-DD format
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        # Get the first response to use as base structure
+        base_eventsearch = {
+            "AcsEventCond": {
+                "searchID": "2",
+                "searchResultPosition": 0,
+                "maxResults": 100,
+                "major": 0,
+                "minor": 0,
+                "startTime": str(today) + "T00:00:00+05:00",
+                "endTime": str(today) + "T23:59:59+08:00",
+            }
+        }
+
+        base_res = self.request(
+            method="POST",
+            path="/ISAPI/AccessControl/AcsEvent?format=json",
+            json=base_eventsearch,
+        )
+
+        # Parse base response
+        if hasattr(base_res, 'json') and callable(getattr(base_res, 'json')):
+            merged_result = base_res.json()
+        else:
+            merged_result = base_res
+
+        # Collect all events from subsequent positions
+        all_events = []
+
+        # Add events from position 0 (already in merged_result)
+        if isinstance(merged_result, dict):
+            if 'AcsEvent' in merged_result:
+                all_events.extend(merged_result['AcsEvent']['InfoList'])
+            elif 'events' in merged_result:
+                all_events.extend(merged_result['events'])
+
+        # Loop through positions 1 to 25
+        for search_result_position in range(1, 26):
+            eventsearch = {
+                "AcsEventCond": {
+                    "searchID": "2",
+                    "searchResultPosition": search_result_position,
+                    "maxResults": 100,
+                    "major": 0,
+                    "minor": 0,
+                    "startTime": str(today) + "T00:00:00+05:00",
+                    "endTime": str(today) + "T23:59:59+08:00",
+                }
+            }
+            
+            res = self.request(
+                method="POST",
+                path="/ISAPI/AccessControl/AcsEvent?format=json",
+                json=eventsearch,
+            )
+            
+            # Extract events from response
+            if hasattr(res, 'json') and callable(getattr(res, 'json')):
+                response_data = res.json()
+            else:
+                response_data = res
+            
+            if isinstance(response_data, dict):
+                if 'AcsEvent' in response_data:
+                    all_events.extend(response_data['AcsEvent']['InfoList'])
+                elif 'events' in response_data:
+                    all_events.extend(response_data['events'])
+
+        # Update the merged result with all collected events
+        if 'AcsEvent' in merged_result:
+            merged_result['AcsEvent']['InfoList'] = all_events
+        elif 'events' in merged_result:
+            merged_result['events'] = all_events
+        else:
+            # If the structure is different, add events as a new key
+            merged_result['allEvents'] = all_events
+
+        # Now merged_result contains a single record with all events     
+        # 
+        print ('resultado')
+        print (merged_result)
+
+        return merged_result   

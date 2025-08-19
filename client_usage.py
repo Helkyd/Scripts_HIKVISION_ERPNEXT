@@ -11,6 +11,7 @@ load_dotenv()
 #import hikvision_isapi
 #from hikvision_isapi import HikvisionClient
 
+import json
 import importlib.util
 
 spec = importlib.util.spec_from_file_location("hikvision_isapi", "./hikvision_isapi/client.py")
@@ -107,8 +108,20 @@ print ('Search ALL Emp....')
 print (searchEmp.status_code)
 print (searchEmp.text)
 
-
+'''
 eventsHoje = hikvision_client.event_search()
-print ('Eventos HOJE....')
+print ('Eventos dia 15....')
 print (eventsHoje.status_code)
 print (eventsHoje.text)
+'''
+
+eventsHoje = hikvision_client.all_event_search()
+print ('Eventos de HOJE....')
+#print (eventsHoje.status_code)
+print (eventsHoje)
+
+'''
+capab = hikvision_client.get_access_events_capabilities()
+print ('cappppp')
+print (capab.text)
+'''
