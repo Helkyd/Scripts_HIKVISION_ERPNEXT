@@ -1,3 +1,4 @@
+#Last Modified 19-08-2025
 import logging
 import os
 from typing import Literal
@@ -6,6 +7,7 @@ import requests
 from requests.auth import HTTPDigestAuth
 from requests.exceptions import HTTPError
 
+from datetime import datetime
 
 class HikvisionHeadersTemplate:
     DEFAULT = None
@@ -286,3 +288,40 @@ class HikvisionClient:
             json=eventsearch,
         )
         return res
+    
+    
+    def all_event_search(self,dataInicio=None,dataFim=None):
+        print ('All Event search...')
+        # Get today's date in YYYY-MM-DD format
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        if dataInicio and dataFim:
+            #set dates
+            eventsearch = {"AcsEventCond": {
+                "searchID":"1",
+                "searchResultPosition":0,
+                "maxResults":100,
+                "major":0,
+                "minor":0,
+                "startTime": dataInicio + "T00:00:00+08:00",
+                "endTime": dataFim + "T23:59:59+08:00",
+                }
+            }
+
+        else:
+            eventsearch = {"AcsEventCond": {
+                "searchID":"1",
+                "searchResultPosition":0,
+                "maxResults":100,
+                "major":0,
+                "minor":0,
+                "startTime": str(today) + "T00:00:00+08:00",
+                "endTime": str(today) + "T23:59:59+08:00",
+                }
+            }
+        res = self.request(
+            method="POST",
+            path="/ISAPI/AccessControl/AcsEvent?format=json",
+            json=eventsearch,
+        )
+        return res    
