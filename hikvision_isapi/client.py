@@ -509,6 +509,8 @@ class HikvisionClient:
                 if 'AcsEvent' in response_data:
                     print ('TEM ACSEVENT... MAS TEM INFILIST!!!!')
                     print (response_data['AcsEvent'])
+                    print ('TEM OU NOA ', 'InfoList' in response_data)
+                    print (response_data['AcsEvent']['InfoList'])
                     all_events.extend(response_data['AcsEvent']['InfoList'])
                 elif 'events' in response_data:
                     all_events.extend(response_data['events'])
