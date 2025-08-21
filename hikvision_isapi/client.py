@@ -507,6 +507,8 @@ class HikvisionClient:
             
             if isinstance(response_data, dict):
                 if 'AcsEvent' in response_data:
+                    print ('TEM ACSEVENT... MAS TEM INFILIST!!!!')
+                    print (response_data['AcsEvent'])
                     all_events.extend(response_data['AcsEvent']['InfoList'])
                 elif 'events' in response_data:
                     all_events.extend(response_data['events'])
@@ -522,7 +524,5 @@ class HikvisionClient:
 
         # Now merged_result contains a single record with all events     
         # 
-        print ('resultado')
-        print (merged_result)
 
         return merged_result   
