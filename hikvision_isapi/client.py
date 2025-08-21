@@ -8,6 +8,7 @@ from requests.auth import HTTPDigestAuth
 from requests.exceptions import HTTPError
 
 from datetime import datetime
+import time
 
 class HikvisionHeadersTemplate:
     DEFAULT = None
@@ -509,11 +510,14 @@ class HikvisionClient:
                 if 'AcsEvent' in response_data:
                     print ('TEM ACSEVENT... MAS TEM INFILIST!!!!')
                     print (response_data['AcsEvent'])
-                    print ('TEM OU NOA ', 'InfoList' in response_data)
-                    print (response_data['AcsEvent']['InfoList'])
-                    all_events.extend(response_data['AcsEvent']['InfoList'])
+                    print ('TEM OU NOA ', 'InfoList' in response_data['AcsEvent'])
+                    if "InfoList" in response_data['AcsEvent']:
+                        all_events.extend(response_data['AcsEvent']['InfoList'])
                 elif 'events' in response_data:
                     all_events.extend(response_data['events'])
+
+            # Optional: Add a small delay to avoid overwhelming the API
+            time.sleep(0.2)
 
         # Update the merged result with all collected events
         if 'AcsEvent' in merged_result:
