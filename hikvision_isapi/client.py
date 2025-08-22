@@ -1,4 +1,4 @@
-#Last Modified 19-08-2025
+#Last Modified 22-08-2025
 import logging
 import os
 from typing import Literal
@@ -481,7 +481,8 @@ class HikvisionClient:
                 all_events.extend(merged_result['events'])
 
         # Loop through positions 1 to 25
-        for search_result_position in range(1, 26):
+        #for search_result_position in range(1, 26):
+        for search_result_position in range(10, 101, 10):
             eventsearch = {
                 "AcsEventCond": {
                     "searchID": "2",

@@ -120,8 +120,7 @@ print ('Eventos de HOJE....')
 #print (eventsHoje.status_code)
 print (eventsHoje)
 
-'''
+
 capab = hikvision_client.get_access_events_capabilities()
 print ('cappppp')
 print (capab.text)
-'''
