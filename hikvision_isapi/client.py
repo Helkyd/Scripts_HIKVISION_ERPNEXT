@@ -7,8 +7,10 @@ import requests
 from requests.auth import HTTPDigestAuth
 from requests.exceptions import HTTPError
 
-from datetime import datetime
+#FIX 08-09-2025
+from datetime import datetime, date, timedelta
 import time
+
 
 class HikvisionHeadersTemplate:
     DEFAULT = None
@@ -445,18 +447,37 @@ class HikvisionClient:
         # Get today's date in YYYY-MM-DD format
         today = datetime.now().strftime("%Y-%m-%d")
 
-        # Get the first response to use as base structure
-        base_eventsearch = {
-            "AcsEventCond": {
-                "searchID": "2",
-                "searchResultPosition": 0,
-                "maxResults": 100,
-                "major": 0,
-                "minor": 0,
-                "startTime": str(today) + "T00:00:00+05:00",
-                "endTime": str(today) + "T23:59:59+08:00",
+        #FIX 08-09-2025
+        diaHoje = datetime.today().day
+
+        if diaHoje == 8 or diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
+            #Get data from day 1
+            # Get the first response to use as base structure
+            base_eventsearch = {
+                "AcsEventCond": {
+                    "searchID": "2",
+                    "searchResultPosition": 0,
+                    "maxResults": 100,
+                    "major": 0,
+                    "minor": 0,
+                    "startTime": str(get_first_day(today)) + "T00:00:00+05:00",
+                    "endTime": str(get_last_day(today)) + "T23:59:59+08:00",
+                }
             }
-        }
+
+        else:            
+            # Get the first response to use as base structure
+            base_eventsearch = {
+                "AcsEventCond": {
+                    "searchID": "2",
+                    "searchResultPosition": 0,
+                    "maxResults": 100,
+                    "major": 0,
+                    "minor": 0,
+                    "startTime": str(today) + "T00:00:00+05:00",
+                    "endTime": str(today) + "T23:59:59+08:00",
+                }
+            }
 
         base_res = self.request(
             method="POST",
@@ -480,45 +501,101 @@ class HikvisionClient:
             elif 'events' in merged_result:
                 all_events.extend(merged_result['events'])
 
-        # Loop through positions 1 to 25
-        #for search_result_position in range(1, 26):
-        for search_result_position in range(10, 101, 10):
-            eventsearch = {
-                "AcsEventCond": {
-                    "searchID": "2",
-                    "searchResultPosition": search_result_position,
-                    "maxResults": 100,
-                    "major": 0,
-                    "minor": 0,
-                    "startTime": str(today) + "T00:00:00+05:00",
-                    "endTime": str(today) + "T23:59:59+08:00",
-                }
-            }
-            
-            res = self.request(
-                method="POST",
-                path="/ISAPI/AccessControl/AcsEvent?format=json",
-                json=eventsearch,
-            )
-            
-            # Extract events from response
-            if hasattr(res, 'json') and callable(getattr(res, 'json')):
-                response_data = res.json()
-            else:
-                response_data = res
-            
-            if isinstance(response_data, dict):
-                if 'AcsEvent' in response_data:
-                    print ('TEM ACSEVENT... MAS TEM INFILIST!!!!')
-                    print (response_data['AcsEvent'])
-                    print ('TEM OU NOA ', 'InfoList' in response_data['AcsEvent'])
-                    if "InfoList" in response_data['AcsEvent']:
-                        all_events.extend(response_data['AcsEvent']['InfoList'])
-                elif 'events' in response_data:
-                    all_events.extend(response_data['events'])
+        if diaHoje == 8 or diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
+            # Loop through positions 1 to 25
+            #for search_result_position in range(1, 26):
+            tmpdia = 1
+            diaTeste = get_first_day(today) #expected result 2025-08-01
+            while tmpdia <= diaHoje:
 
-            # Optional: Add a small delay to avoid overwhelming the API
-            time.sleep(0.2)
+                for search_result_position in range(10, 101, 10):
+                    eventsearch = {
+                        "AcsEventCond": {
+                            "searchID": "2",
+                            "searchResultPosition": search_result_position,
+                            "maxResults": 100,
+                            "major": 0,
+                            "minor": 0,
+                            "startTime": str(diaTeste) + "T00:00:00+05:00",
+                            "endTime": str(diaTeste) + "T23:59:59+08:00",
+                        }
+                    }
+                    
+                    res = self.request(
+                        method="POST",
+                        path="/ISAPI/AccessControl/AcsEvent?format=json",
+                        json=eventsearch,
+                    )
+                    
+                    # Extract events from response
+                    if hasattr(res, 'json') and callable(getattr(res, 'json')):
+                        response_data = res.json()
+                    else:
+                        response_data = res
+                    
+                    if isinstance(response_data, dict):
+                        if 'AcsEvent' in response_data:
+                            print ('TEM ACSEVENT... MAS TEM INFILIST!!!!')
+                            print (response_data['AcsEvent'])
+                            print ('TEM OU NOA ', 'InfoList' in response_data['AcsEvent'])
+                            if "InfoList" in response_data['AcsEvent']:
+                                all_events.extend(response_data['AcsEvent']['InfoList'])
+                        elif 'events' in response_data:
+                            all_events.extend(response_data['events'])
+
+                    # Optional: Add a small delay to avoid overwhelming the API
+                    time.sleep(0.2)
+
+                tmpdia += 1
+                # Convert string to datetime object
+                date_obj = datetime.strptime(diaTeste, '%Y-%m-%d')
+
+                # Add one day using timedelta
+                new_date = date_obj + timedelta(days=1)
+
+                # Convert back to string if needed
+                diaTeste = new_date.strftime('%Y-%m-%d')
+
+        else:            
+            # Loop through positions 1 to 25
+            #for search_result_position in range(1, 26):
+            for search_result_position in range(10, 101, 10):
+                eventsearch = {
+                    "AcsEventCond": {
+                        "searchID": "2",
+                        "searchResultPosition": search_result_position,
+                        "maxResults": 100,
+                        "major": 0,
+                        "minor": 0,
+                        "startTime": str(today) + "T00:00:00+05:00",
+                        "endTime": str(today) + "T23:59:59+08:00",
+                    }
+                }
+                
+                res = self.request(
+                    method="POST",
+                    path="/ISAPI/AccessControl/AcsEvent?format=json",
+                    json=eventsearch,
+                )
+                
+                # Extract events from response
+                if hasattr(res, 'json') and callable(getattr(res, 'json')):
+                    response_data = res.json()
+                else:
+                    response_data = res
+                
+                if isinstance(response_data, dict):
+                    if 'AcsEvent' in response_data:
+                        print ('TEM ACSEVENT... MAS TEM INFILIST!!!!')
+                        print (response_data['AcsEvent'])
+                        print ('TEM OU NOA ', 'InfoList' in response_data['AcsEvent'])
+                        if "InfoList" in response_data['AcsEvent']:
+                            all_events.extend(response_data['AcsEvent']['InfoList'])
+                    elif 'events' in response_data:
+                        all_events.extend(response_data['events'])
+
+                # Optional: Add a small delay to avoid overwhelming the API
+                time.sleep(0.2)
 
         # Update the merged result with all collected events
         if 'AcsEvent' in merged_result:
@@ -533,3 +610,14 @@ class HikvisionClient:
         # 
 
         return merged_result   
+    
+
+
+def get_first_day(dt, d_years=0, d_months=0):
+	# d_years, d_months are "deltas" to apply to dt
+	y, m = dt.year + d_years, dt.month + d_months
+	a, m = divmod(m-1, 12)
+	return date(y+a, m+1, 1)
+
+def get_last_day(dt):
+	return get_first_day(dt, 0, 1) + timedelta(-1)
