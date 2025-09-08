@@ -453,6 +453,7 @@ class HikvisionClient:
         if diaHoje == 8 or diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
             #Get data from day 1
             # Get the first response to use as base structure
+            print ('DIaHOJe ', diaHoje)
             base_eventsearch = {
                 "AcsEventCond": {
                     "searchID": "2",
@@ -505,7 +506,8 @@ class HikvisionClient:
             # Loop through positions 1 to 25
             #for search_result_position in range(1, 26):
             tmpdia = 1
-            diaTeste = get_first_day(datetime.today()) #expected result 2025-08-01
+            diaTeste = str(get_first_day(datetime.today())) #expected result 2025-08-01
+            print ('diateste aqui ', diaTeste)
             while tmpdia <= diaHoje:
 
                 for search_result_position in range(10, 101, 10):
@@ -548,7 +550,8 @@ class HikvisionClient:
 
                 tmpdia += 1
                 # Convert string to datetime object
-                date_obj = datetime.strptime(diaTeste, '%Y-%m-%d')
+                date_obj = diaTeste.strftime('%Y-%m-%d') #datetime.strptime(diaTeste, '%Y-%m-%d')
+                print ('date_obj ', date_obj)
 
                 # Add one day using timedelta
                 new_date = date_obj + timedelta(days=1)
