@@ -460,8 +460,8 @@ class HikvisionClient:
                     "maxResults": 100,
                     "major": 0,
                     "minor": 0,
-                    "startTime": str(get_first_day(today)) + "T00:00:00+05:00",
-                    "endTime": str(get_last_day(today)) + "T23:59:59+08:00",
+                    "startTime": str(get_first_day(datetime.today())) + "T00:00:00+05:00",
+                    "endTime": str(get_last_day(datetime.today())) + "T23:59:59+08:00",
                 }
             }
 
@@ -505,7 +505,7 @@ class HikvisionClient:
             # Loop through positions 1 to 25
             #for search_result_position in range(1, 26):
             tmpdia = 1
-            diaTeste = get_first_day(today) #expected result 2025-08-01
+            diaTeste = get_first_day(datetime.today()) #expected result 2025-08-01
             while tmpdia <= diaHoje:
 
                 for search_result_position in range(10, 101, 10):
