@@ -508,6 +508,8 @@ class HikvisionClient:
             tmpdia = 1
             diaTeste = str(get_first_day(datetime.today())) #expected result 2025-08-01
             print ('diateste aqui ', diaTeste)
+            print ('tipo ', type(diaTeste))
+
             while tmpdia <= diaHoje:
 
                 for search_result_position in range(10, 101, 10):
@@ -550,7 +552,7 @@ class HikvisionClient:
 
                 tmpdia += 1
                 # Convert string to datetime object
-                date_obj = diaTeste.strftime('%Y-%m-%d') #datetime.strptime(diaTeste, '%Y-%m-%d')
+                date_obj = datetime.strptime(str(diaTeste), '%Y-%m-%d')
                 print ('date_obj ', date_obj)
 
                 # Add one day using timedelta
