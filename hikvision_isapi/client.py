@@ -450,7 +450,7 @@ class HikvisionClient:
         #FIX 08-09-2025
         diaHoje = datetime.today().day
 
-        if diaHoje == 8 or diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
+        if diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
             #Get data from day 1
             # Get the first response to use as base structure
             print ('DIaHOJe ', diaHoje)
@@ -502,7 +502,7 @@ class HikvisionClient:
             elif 'events' in merged_result:
                 all_events.extend(merged_result['events'])
 
-        if diaHoje == 8 or diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
+        if diaHoje == 25 or diaHoje == 31 or diaHoje == 28 or diaHoje == 30:
             # Loop through positions 1 to 25
             #for search_result_position in range(1, 26):
             tmpdia = 1
